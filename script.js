@@ -1,28 +1,54 @@
-var timeStamps = [{
-    "9am": 9,
-    "10am": 10,
-    "11am": 11,
-    "12pm": 12,
-    "1pm": 13,
-    "2pm": 14,
-    "3pm": 15,
-    "4pm": 16,
-    "5pm": 17,
-    "6pm": 18,
-    "7pm": 19,
-    "8pm": 20,
-    "9pm": 21,
-    "10pm": 22,
-    "11pm": 23,
-    "12am": 24
-}]
+var timeStamps = {
+    standard: ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm", "11pm", "12am"],
+    military: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+    messages: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+};
 
-var standardTime = Object.keys(timeStamps[0]);
-var militaryTime = Object.values(timeStamps[0]);
+// get local stored info
 
+var standardTime = timeStamps.standard;
+var militaryTime = timeStamps.military;
+var messages = timeStamps.messages;
 
 
 $(document).ready(function () {
+
+
+
+
+    function init() {
+
+        var storage = JSON.parse(localStorage.getItem("timeStamps"));
+
+        if (storage) {
+            timeStamps = storage;
+            messages = timeStamps.messages; //update messages from previous save
+        }
+
+        renderMessages();
+    }
+
+    function renderMessages() {
+        console.log("****************from render****************");
+        for (let i = 0; i < messages.length; i++) {
+            // textarea with id
+            var id = i + 9;
+
+            if (messages[i] !== null) {
+                $('#' + id).val(messages[i]);
+
+                console.log(typeof messages[i]);
+
+                console.log(`this id: ${id} with message: ${messages[i]}`);
+            }
+        }
+    }
+
+
+    function storeMessage() {
+        localStorage.setItem("timeStamps", JSON.stringify(timeStamps))
+    }
+
 
     // Load Time blocks
     for (let i = 0; i < militaryTime.length; i++) {
@@ -36,8 +62,9 @@ $(document).ready(function () {
         hour.addClass("hour")
         timeBlock.append(hour)
         // Time block text
-        var timeBlockText = $('<input>')
+        var timeBlockText = $('<textarea>')
         timeBlockText.addClass("description textarea")
+        timeBlockText.attr("id", militaryTime[i]);
         timeBlock.append(timeBlockText)
         // Time block save button
         var saveBtn = $('<button>')
@@ -56,9 +83,6 @@ $(document).ready(function () {
             timeBlockText.addClass("past")
         }
 
-
-
-
         $('.container').append(timeBlock)
     }
 
@@ -73,25 +97,21 @@ $(document).ready(function () {
     setInterval(updateTime, 1000);
 
 
-    $('.saveBtn').on("click", () => {
-        console.log($(this).val());
-        console.log(typeof militaryTime[0]);
-        
-        
+    $('.saveBtn').on("click", function (event) {
+        event.preventDefault()
+
+        var id = parseInt($(this).val()); //get value of button = id of textarea
+
+        var text = $('#' + id).val() //textarea with id
+
+        timeStamps.messages[id - 9] = text;
+
+        storeMessage(); // store timeStamp as "timeStamp"
+        renderMessages();
+        // console.log(messages);
+
     })
-    
+
+    init();
+
 })
-
-
-var arr = [{
-    standard: "9am",
-    military: 9,
-    message: "Hello"
-}, {
-    standard: "10am",
-    military: 10,
-    message: "Hello"
-}]
-
-console.log(arr[1]);
-
