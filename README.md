@@ -5,8 +5,7 @@ To create daily scheduler to plan out the users' day.
 
 View the site [here](https://eddyangang.github.io/scheduler/).
 
-## User requirements
-## User Story
+## User Requirements
 
 ```
 AS AN employee with a busy schedule

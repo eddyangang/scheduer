@@ -4,8 +4,7 @@ var timeStamps = {
     messages: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
 };
 
-// get local stored info
-
+// Extract information fron timeStamps.
 var standardTime = timeStamps.standard;
 var militaryTime = timeStamps.military;
 var messages = timeStamps.messages;
@@ -13,66 +12,70 @@ var messages = timeStamps.messages;
 
 $(document).ready(function () {
 
-
-
-
+    // Initial function when page loads.
     function init() {
-
+        // Retrieve local storage on timeStamp if it exist. 
         var storage = JSON.parse(localStorage.getItem("timeStamps"));
 
+        // if there is an existing timeStamp,then load previous messages
         if (storage) {
             timeStamps = storage;
-            messages = timeStamps.messages; //update messages from previous save
+             //update messages from previous save
+            messages = timeStamps.messages;
         }
-
+        // load messages onto timeblock
         renderMessages();
     }
 
+    // Load messages onto timeblock
     function renderMessages() {
-        console.log("****************from render****************");
+    
         for (let i = 0; i < messages.length; i++) {
-            // textarea with id
+            // This "id" maps the corresponding message with its appropriate textarea. 
+            // The text area has an of id = i+9.
             var id = i + 9;
 
+            // if message is not empty, then load message onto timeblock.
             if (messages[i] !== null) {
                 $('#' + id).val(messages[i]);
 
-                console.log(typeof messages[i]);
-
-                console.log(`this id: ${id} with message: ${messages[i]}`);
             }
         }
     }
 
-
+    // Store the message when user clicks save.
     function storeMessage() {
         localStorage.setItem("timeStamps", JSON.stringify(timeStamps))
     }
 
 
-    // Load Time blocks
+    // This for loop will create every timeblock, including the hour, textarea and button. 
     for (let i = 0; i < militaryTime.length; i++) {
 
-        // Create Time Block element
+        // Create Time Block element as the parent
         var timeBlock = $('<div>')
         timeBlock.addClass("time-block row")
+
         //Hour Display
         var hour = $('<h3>')
         hour.text(standardTime[i])
         hour.addClass("hour")
         timeBlock.append(hour)
+
         // Time block text
         var timeBlockText = $('<textarea>')
         timeBlockText.addClass("description textarea")
         timeBlockText.attr("id", militaryTime[i]);
         timeBlock.append(timeBlockText)
+
         // Time block save button
         var saveBtn = $('<button>')
         var icon = ('<i class="far fa-save"></i>')
         saveBtn.append(icon)
         saveBtn.addClass("saveBtn")
-        saveBtn.attr("value", militaryTime[i]) // maybe
+        saveBtn.attr("value", militaryTime[i]) // sets the value of the save button with its corresponding military time. 
         timeBlock.append(saveBtn)
+
         // Check current hour to style the past, present, and future time blocks. 
         var todayHours = moment().hour();
         if (todayHours === militaryTime[i]) {
@@ -86,30 +89,37 @@ $(document).ready(function () {
         $('.container').append(timeBlock)
     }
 
-    // Set up date and time display
+    // Set up date and time display on the top center
     $('#currentDay').text(moment().format("dddd, MMMM Do YYYY"))
 
-    let updateTime = function () {
+    // Set the text of the current time. 
+    var updateTime = function () {
         $("#currentTime").text(moment().format('h:mm:ss'))
     }
 
+    // Update the time when the page loads to prevent it from initially being hidden.
     updateTime();
+
+    // Update the time every second.
     setInterval(updateTime, 1000);
 
-
+    // Add event listener on every save button. 
     $('.saveBtn').on("click", function (event) {
+        // Prevents the page from refreshing when button is pressed. 
         event.preventDefault()
 
-        var id = parseInt($(this).val()); //get value of button = id of textarea
+        //get value of button = id of textarea
+        var id = parseInt($(this).val()); 
 
-        var text = $('#' + id).val() //textarea with id
+        //textarea with id
+        var text = $('#' + id).val() 
 
+        // sets the message for corresponding timeblock.
         timeStamps.messages[id - 9] = text;
 
-        storeMessage(); // store timeStamp as "timeStamp"
+        // store timeStamp as "timeStamp"
+        storeMessage();
         renderMessages();
-        // console.log(messages);
-
     })
 
     init();
